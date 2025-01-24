@@ -9,11 +9,11 @@ package chess;
 public class ChessPosition {
 
     private final int row;
-    private final int column;
+    private final int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
-        this.column = col;
+        this.col = col;
     }
 
     /**
@@ -29,6 +29,6 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return column;
+        return col;
     }
 }
