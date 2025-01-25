@@ -61,7 +61,7 @@ public class ChessPiece {
                 if (team == ChessGame.TeamColor.WHITE) {
                     ChessPosition endPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
                     if (board.getPiece(endPosition) == null && legalLocation(endPosition)) {
-                        moves.add(new ChessMove(myPosition, endPosition, null));
+                        moves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow(), myPosition.getColumn()-1), null));
                         if (myPosition.getRow() == 2) {
                             endPosition = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
                             if (board.getPiece(endPosition) == null && legalLocation(endPosition)) {
