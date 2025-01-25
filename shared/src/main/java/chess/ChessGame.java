@@ -50,8 +50,22 @@ public class ChessGame {
         if (startPosition == null || getBoard().getPiece(startPosition) == null) {
             return null;
         }
-        return getBoard().getPiece(startPosition).pieceMoves(getBoard(), startPosition);
+
+        // Retrieve all possible moves for the piece
+        Collection<ChessMove> allMoves = getBoard().getPiece(startPosition).pieceMoves(getBoard(), startPosition);
+
+        // Filter moves that would leave the king in check
+        TeamColor currentTeamColor = getBoard().getPiece(startPosition).getTeamColor();
+        allMoves.removeIf(move -> {
+            ChessBoard simulatedBoard = cloneBoard(); // Create a simulated board
+            ChessPiece movingPiece = simulatedBoard.getPiece(move.getStartPosition());
+            simulatedBoard.addPiece(move.getEndPosition(), movingPiece);
+            simulatedBoard.addPiece(move.getStartPosition(), null); // Remove the piece from the starting position
+            return isInCheck(currentTeamColor); // Check if the move results in the king being in check
+        });
+        return allMoves;
     }
+
 
     /**
      * Makes a move in a chess game

@@ -69,18 +69,6 @@ public class ChessPiece {
                             }
                         }
                     }
-                } else {
-                    ChessPosition endPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
-                    if (board.getPiece(endPosition) == null && legalLocation(endPosition)) {
-                        moves.add(new ChessMove(myPosition, endPosition, null));
-                        if (myPosition.getRow() == 2) {
-                            endPosition = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
-                            if (board.getPiece(endPosition) == null && legalLocation(endPosition)) {
-                                moves.add(new ChessMove(myPosition, endPosition, null));
-                            }
-                        }
-                    }
-
                 }
             }
         }

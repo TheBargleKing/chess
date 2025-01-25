@@ -8,8 +8,9 @@ package chess;
  */
 public class ChessBoard {
     private ChessPiece[][] spaces = new ChessPiece[8][8];
+
     public ChessBoard() {
-        resetBoard();
+        // resetBoard();
     }
 
     /**
@@ -19,9 +20,12 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        spaces[position.getRow()][position.getColumn()] = piece;
+        int adjustedRow = position.getRow() - 1; // Convert 1-8 to 0-7
+        int adjustedColumn = position.getColumn() - 1; // Convert 1-8 to 0-7
+        if (adjustedRow >= 0 && adjustedRow < 8 && adjustedColumn >= 0 && adjustedColumn < 8) {
+            spaces[adjustedRow][adjustedColumn] = piece;
+        }
     }
-
 
     /**
      * Gets a chess piece on the chessboard
@@ -31,7 +35,12 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return spaces[position.getRow()][position.getColumn()];
+        int adjustedRow = position.getRow() - 1; // Convert 1-8 to 0-7
+        int adjustedColumn = position.getColumn() - 1; // Convert 1-8 to 0-7
+        if (adjustedRow >= 0 && adjustedRow < 8 && adjustedColumn >= 0 && adjustedColumn < 8) {
+            return spaces[adjustedRow][adjustedColumn];
+        }
+        return null;
     }
 
     /**
@@ -55,7 +64,6 @@ public class ChessBoard {
         spaces[0][7] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
         spaces[7][0] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
         spaces[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-
 
         // Adding knights next to rooks
         spaces[0][1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
