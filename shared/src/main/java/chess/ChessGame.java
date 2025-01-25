@@ -193,8 +193,10 @@ public class ChessGame {
                     continue;
                 }
                 if (validMoves(currentPosition) == null || validMoves(currentPosition).isEmpty()) {
-                } else {
                     return false;
+                }
+                else {
+                    return true;
                 }
 
             }
