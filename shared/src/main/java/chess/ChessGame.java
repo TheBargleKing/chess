@@ -135,33 +135,19 @@ public class ChessGame {
                         continue;
                     }
 
-                    // Step 3: Get valid moves for this piece
+                    // Get valid moves for each piece
                     Collection<ChessMove> validMoves = validMoves(currentPosition);
                     if (validMoves == null || validMoves.isEmpty()) continue;
 
-                    // Step 4: Simulate each move
+                    // Simulate each move
                     for (ChessMove move : validMoves) {
-                        ChessBoard simulatedBoard = cloneBoard(Board); // Clone current board
+                        ChessBoard simulatedBoard = cloneBoard(); // Clone current board
                         ChessGame simulatedGame = new ChessGame();
                         simulatedGame.setBoard(simulatedBoard);
-
                         // Apply the move to the simulated game
-                        if (validMoves(move.getStartPosition()) == null || !validMoves(move.getStartPosition()).contains(move.getEndPosition())) {
-                            throw new InvalidMoveException("The requested move is invalid.");
-                        }
-                        // Determine movingPiece
-                        ChessPiece movingPiece = Board.getPiece(move.getStartPosition());
-                        if (move.getPromotionPiece() == null) {
-                            // Move the piece (if not promoting)
-                            Board.addPiece(move.getEndPosition(), movingPiece);
-                            Board.addPiece(move.getStartPosition(), null);
-                        }
-                        else {
-                            // Creates the promoted piece at the end location
-                            Board.addPiece(move.getEndPosition(), new ChessPiece(TeamTurn, move.getPromotionPiece()));
-                            Board.addPiece(move.getStartPosition(), null);
-                        }
-
+                        ChessPiece movingPiece = simulatedBoard.getPiece(move.getStartPosition());
+                        simulatedBoard.addPiece(move.getEndPosition(), movingPiece);
+                        simulatedBoard.addPiece(move.getStartPosition(), null);
                         // Check if the team is still in check
                         if (!simulatedGame.isInCheck(teamColor)) {
                             return false; // If a move removes check, not checkmate
@@ -181,7 +167,24 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPosition currentPosition = new ChessPosition(row, col);
+                ChessPiece piece = Board.getPiece(currentPosition);
+
+                // Skip empty positions or positions with pieces of the opposite team
+                if (piece == null || piece.getTeamColor() != teamColor) {
+                    continue;
+                }
+                if (validMoves(currentPosition) == null || validMoves(currentPosition).isEmpty()) {
+                    continue;
+                } else {
+                    return false;
+                }
+
+            }
+        }
+        return true;
     }
 
     /**
