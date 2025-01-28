@@ -1,5 +1,7 @@
 package chess;
 
+
+
 /**
  * Represents moving a chess piece on a chessboard
  * <p>
@@ -7,10 +9,9 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessMove {
-
-    private final ChessPosition startPosition;
-    private final ChessPosition endPosition;
-    private final ChessPiece.PieceType promotionPiece;
+    private ChessPosition startPosition;
+    private ChessPosition endPosition;
+    private ChessPiece.PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
@@ -41,5 +42,28 @@ public class ChessMove {
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessMove that = (ChessMove) o;
+        return startPosition.equals(that.startPosition) &&
+                endPosition.equals(that.endPosition) &&
+                (promotionPiece == that.promotionPiece ||
+                        (promotionPiece != null && promotionPiece.equals(that.promotionPiece)));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = startPosition.hashCode();
+        result = 31 * result + endPosition.hashCode();
+        result = 31 * result + (promotionPiece != null ? promotionPiece.hashCode() : 0);
+        return result;
     }
 }
