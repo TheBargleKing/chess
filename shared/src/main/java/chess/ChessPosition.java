@@ -1,5 +1,7 @@
 package chess;
 
+
+
 /**
  * Represents a single square position on a chess board
  * <p>
@@ -45,6 +47,6 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return  col;
+        return col;
     }
 }

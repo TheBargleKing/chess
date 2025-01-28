@@ -9,9 +9,10 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessMove {
-    private ChessPosition startPosition;
-    private ChessPosition endPosition;
+    private chess.ChessPosition startPosition;
+    private chess.ChessPosition endPosition;
     private ChessPiece.PieceType promotionPiece;
+
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
@@ -45,18 +46,18 @@ public class ChessMove {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        ChessMove that = (ChessMove) o;
-        return startPosition.equals(that.startPosition) &&
-                endPosition.equals(that.endPosition) &&
-                (promotionPiece == that.promotionPiece ||
-                        (promotionPiece != null && promotionPiece.equals(that.promotionPiece)));
+        ChessMove other = (ChessMove) obj;
+        return startPosition.equals(other.startPosition)
+                && endPosition.equals(other.endPosition)
+                && ((promotionPiece == null && other.promotionPiece == null)
+                || (promotionPiece != null && promotionPiece.equals(other.promotionPiece)));
     }
 
     @Override
