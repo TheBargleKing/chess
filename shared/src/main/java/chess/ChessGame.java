@@ -86,7 +86,10 @@ public class ChessGame {
         if (gameBoard.getPiece(start) == null || teamTurn != gameBoard.getPiece(start).getTeamColor()) {
             throw new InvalidMoveException();
         }
-        if (start.equals(end) || start.equals(null) || end.equals(null) || !checkBounds(start) || !checkBounds(end)) {
+        if (gameBoard.getPiece(end) != null && teamTurn == gameBoard.getPiece(end).getTeamColor()) {
+            throw new InvalidMoveException();
+        }
+        if (!gameBoard.getPiece(start).pieceMoves(gameBoard, start).contains(move) || isInCheck(teamTurn) || start.equals(end) || start.equals(null) || end.equals(null) || !checkBounds(start) || !checkBounds(end)) {
             throw new InvalidMoveException();
         }
         ChessPiece movingPiece = gameBoard.getPiece(start);
@@ -95,6 +98,9 @@ public class ChessGame {
             gameBoard.addPiece(end,new ChessPiece(movingPiece.getTeamColor(),move.getPromotionPiece()));
         } else {
             gameBoard.addPiece(end, movingPiece);
+        }
+        if (isInCheck(teamTurn)) {
+            throw new InvalidMoveException();
         }
         if (teamTurn == TeamColor.WHITE) {
             teamTurn = TeamColor.BLACK;
@@ -121,9 +127,12 @@ public class ChessGame {
                 }
                 if (testPiece.getTeamColor() == enemyColor) {
                     ChessBoard simBoard = cloneBoard(gameBoard);
+                    ChessGame simGame = new ChessGame();
+                    simGame.setTeamTurn(teamTurn);
+                    simGame.setBoard(simBoard);
                     for (ChessMove move : testPiece.pieceMoves(simBoard, testPosition)) {
                         try {
-                            makeMove(move);
+                            simGame.makeMove(move);
                         } catch (InvalidMoveException e) {
                             continue;
                         }
@@ -131,7 +140,6 @@ public class ChessGame {
                             return true;
                         }
                     }
-                    return false;
                 }
             }
         }
