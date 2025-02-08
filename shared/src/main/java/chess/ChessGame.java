@@ -40,11 +40,38 @@ public class ChessGame {
     }
 
     private boolean isInCheckAfterMove(ChessMove move) {
+        if (gameBoard.getPiece(move.getStartPosition()).getPieceType()  == ChessPiece.PieceType.KING) {
+            if (isInCheckAfterKingMove(move)) {
+                return true;
+            }
+        }
         ChessBoard simulatedBoard = cloneBoard(gameBoard);
         ChessPiece piece = simulatedBoard.getPiece(move.getStartPosition());
         simulatedBoard.addPiece(move.getEndPosition(), piece);
         simulatedBoard.addPiece(move.getStartPosition(), null);
         return isInCheck(piece.getTeamColor(), simulatedBoard);
+    }
+
+    private boolean isInCheckAfterKingMove(ChessMove move) {
+        ChessBoard simulatedBoard = cloneBoard(gameBoard);
+        ChessPiece piece = simulatedBoard.getPiece(move.getStartPosition());
+        TeamColor enemyColor = (piece.getTeamColor() == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        simulatedBoard.addPiece(move.getStartPosition(), null);
+        simulatedBoard.addPiece(move.getEndPosition(), piece);
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece attackingPiece = simulatedBoard.getPiece(position);
+                if (attackingPiece != null && attackingPiece.getTeamColor() == enemyColor) {
+                    for (ChessMove checkMove : attackingPiece.pieceMoves(simulatedBoard, position)) {
+                        if (checkMove.getEndPosition().equals(move.getEndPosition())) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
