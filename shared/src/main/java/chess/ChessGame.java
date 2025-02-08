@@ -22,16 +22,15 @@ public class ChessGame {
     }
 
     public enum TeamColor {
-        WHITE,
-        BLACK
+        WHITE, BLACK
     }
 
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
         if (startPosition == null || gameBoard.getPiece(startPosition) == null) {
-            return null;
+            return validMoves;
         }
         ChessPiece piece = gameBoard.getPiece(startPosition);
-        Collection<ChessMove> validMoves = new ArrayList<>();
         for (ChessMove move : piece.pieceMoves(gameBoard, startPosition)) {
             if (!isInCheckAfterMove(move)) {
                 validMoves.add(move);
@@ -41,39 +40,39 @@ public class ChessGame {
     }
 
     private boolean isInCheckAfterMove(ChessMove move) {
-        ChessPosition start = move.getStartPosition();
         ChessBoard simulatedBoard = cloneBoard(gameBoard);
-        simulatedBoard.addPiece(move.getEndPosition(), simulatedBoard.getPiece(start));
-        simulatedBoard.addPiece(start, null);
-
-        TeamColor teamColor = simulatedBoard.getPiece(move.getEndPosition()).getTeamColor();
-        return isInCheck(teamColor, simulatedBoard);
+        ChessPiece piece = simulatedBoard.getPiece(move.getStartPosition());
+        simulatedBoard.addPiece(move.getEndPosition(), piece);
+        simulatedBoard.addPiece(move.getStartPosition(), null);
+        return isInCheck(piece.getTeamColor(), simulatedBoard);
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (move == null) {
             throw new InvalidMoveException("Invalid Move: Move cannot be null.");
         }
-        ChessPosition start = move.getStartPosition();
-        ChessPosition end = move.getEndPosition();
-        ChessPiece movingPiece = gameBoard.getPiece(start);
+        ChessPiece movingPiece = gameBoard.getPiece(move.getStartPosition());
         if (movingPiece == null || teamTurn != movingPiece.getTeamColor()) {
             throw new InvalidMoveException("Invalid move: No piece at position or not your turn.");
         }
-        if (!validMoves(start).contains(move)) {
+        if (!validMoves(move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException("Invalid move: Move not valid.");
         }
+
         // Perform the move
-        gameBoard.addPiece(start, null);
+        gameBoard.addPiece(move.getStartPosition(), null);
         if (move.getPromotionPiece() != null) {
-            gameBoard.addPiece(end, new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece()));
+            gameBoard.addPiece(move.getEndPosition(), new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece()));
         } else {
-            gameBoard.addPiece(end, movingPiece);
+            gameBoard.addPiece(move.getEndPosition(), movingPiece);
         }
-        // Make sure not moving into check.
+
+        // Ensure the move doesn't leave the king in check
         if (isInCheck(teamTurn)) {
             throw new InvalidMoveException("Invalid move: Cannot move into check.");
         }
+
+        // Switch turns
         teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
@@ -83,9 +82,8 @@ public class ChessGame {
 
     private boolean isInCheck(TeamColor teamColor, ChessBoard board) {
         ChessPosition kingPosition = findKingPosition(teamColor, board);
-        if (kingPosition == null) {
-            return false;
-        }
+        if (kingPosition == null) return false;
+
         TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
@@ -117,19 +115,14 @@ public class ChessGame {
     }
 
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) {
-            return false;
-        }
+        if (!isInCheck(teamColor)) return false;
 
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition position = new ChessPosition(i, j);
                 ChessPiece piece = gameBoard.getPiece(position);
-
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    for (ChessMove move : validMoves(position)) {
-                        return false; // If at least one move gets out of check, it's not checkmate
-                    }
+                if (piece != null && piece.getTeamColor() == teamColor && !validMoves(position).isEmpty()) {
+                    return false;
                 }
             }
         }
@@ -137,19 +130,14 @@ public class ChessGame {
     }
 
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) {
-            return false;
-        }
+        if (isInCheck(teamColor)) return false;
 
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition position = new ChessPosition(i, j);
                 ChessPiece piece = gameBoard.getPiece(position);
-
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    if (!validMoves(position).isEmpty()) {
-                        return false; // If at least one move is possible, it's not stalemate
-                    }
+                if (piece != null && piece.getTeamColor() == teamColor && !validMoves(position).isEmpty()) {
+                    return false;
                 }
             }
         }
@@ -157,16 +145,15 @@ public class ChessGame {
     }
 
     public void setBoard(ChessBoard board) {
-        gameBoard = board;
+        this.gameBoard = board;
     }
 
     public ChessBoard getBoard() {
         return gameBoard;
     }
 
-    public ChessBoard cloneBoard(ChessBoard board) {
+    private ChessBoard cloneBoard(ChessBoard board) {
         ChessBoard newBoard = new ChessBoard();
-
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition position = new ChessPosition(i, j);
